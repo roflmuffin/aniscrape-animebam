@@ -1,6 +1,6 @@
 {
   "name": "aniscrape-animebam",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Animebam scraping module for aniscrape.",
   "main": "lib/index.js",
   "scripts": {
