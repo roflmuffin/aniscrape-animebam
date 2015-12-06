@@ -2,6 +2,10 @@ Promise = require 'bluebird'
 needle = Promise.promisifyAll(require 'needle')
 cheerio = require 'cheerio'
 
+needle.defaults({
+  follow_max: 10
+})
+
 module.exports =
   name: 'animebam'
 
