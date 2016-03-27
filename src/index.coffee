@@ -2,6 +2,9 @@ Promise = require 'bluebird'
 needle = Promise.promisifyAll(require 'needle')
 cheerio = require 'cheerio'
 
+needle.defaults
+  follow_max: 5
+
 module.exports =
   name: 'animebam'
 
@@ -35,14 +38,15 @@ module.exports =
     url = "http://animebam.net" + $("iframe.embed-responsive-item").attr('src')
     needle.getAsync(url).then (resp) ->
       $ = cheerio.load(resp.body)
-      episodes = eval($("script:contains('videoSources')").html().match(/\[.+\]/)[0])
+
+      sources = eval($("script:contains('videoSources')").html().match(/\[.+\]/)[0])
 
       options =
         follow_max: 0
         headers:
           'Referer': 'http://animebam.net/'
-          
-      Promise.map episodes, (video) ->
+
+      Promise.map sources, (video) ->
         needle.headAsync(video.file, options).then (resp) ->
           return {
             label: video.label
