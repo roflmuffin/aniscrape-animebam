@@ -1,12 +1,16 @@
 Promise = require 'bluebird'
 needle = Promise.promisifyAll(require 'needle')
 cheerio = require 'cheerio'
+_ = require 'lodash'
 
 needle.defaults
   follow_max: 5
 
 module.exports =
   name: 'animebam'
+  #
+  http_options:
+    follow_max: 5
 
   initialize: ->
     console.log "[#{@name}] loaded successfully."
@@ -18,6 +22,9 @@ module.exports =
     # page: 'http://www.animebam.net/series'
 
     list: '.mse'
+    list: ($, body) ->
+      return $('.mse')
+
     row:
       name: (el) ->
         el.find("h2").text()
@@ -31,24 +38,28 @@ module.exports =
         el.find(".anititle").text()
       url: (el) ->
         "http://animebam.net" + el.find("a").attr("href")
-      number: (el) ->
-        el.find('.anm_det_pop').text().match(/(?=[^\s]*$)\d+/)[0]
+      # number: (el) ->
+      #   el.find('.anm_det_pop').text().match(/(?=[^\s]*$)\d+/)[0]
 
   episode: ($, body) ->
-    url = "http://animebam.net" + $("iframe.embed-responsive-item").attr('src')
-    needle.getAsync(url).then (resp) ->
-      $ = cheerio.load(resp.body)
+    videoFrames = $('.tab-pane iframe').get().map (item) ->
+      item = $(item)
+      type: item.parent().attr('id')
+      frameUrl: 'http://animebam.net' + item.attr('src')
 
-      sources = eval($("script:contains('videoSources')").html().match(/\[.+\]/)[0])
+    Promise.map videoFrames, (frame) =>
+      needle.getAsync(frame.frameUrl).then (resp) =>
+        $ = cheerio.load(resp.body)
+        sources = eval($("script:contains('videoSources')").html().match(/\[.+\]/)[0])
+        options =
+            follow_max: 0
+            headers:
+              'Referer': 'http://animebam.net/'
 
-      options =
-        follow_max: 0
-        headers:
-          'Referer': 'http://animebam.net/'
-
-      Promise.map sources, (video) ->
-        needle.headAsync(video.file, options).then (resp) ->
-          return {
-            label: video.label
-            url: resp.headers.location
-          }
+          Promise.map sources, (video) =>
+            needle.headAsync(video.file, options).then (resp) =>
+              return {
+                label: frame.type + '-' + video.label
+                url: resp.headers.location
+              }
+    .then(_.flatten)
