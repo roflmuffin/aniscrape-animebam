@@ -8,7 +8,7 @@ needle.defaults
 
 module.exports =
   name: 'animebam'
-  #
+
   http_options:
     follow_max: 5
 
@@ -16,14 +16,9 @@ module.exports =
     console.log "[#{@name}] loaded successfully."
 
   search:
-    # page: (query) ->
-      # needle.getAsync("http://animebam.net/search?search=#{query}").get('body')
     page: {url: 'http://animebam.net/search', param: 'search'}
-    # page: 'http://www.animebam.net/series'
 
     list: '.mse'
-    list: ($, body) ->
-      return $('.mse')
 
     row:
       name: (el) ->
@@ -38,8 +33,6 @@ module.exports =
         el.find(".anititle").text()
       url: (el) ->
         "http://animebam.net" + el.find("a").attr("href")
-      # number: (el) ->
-      #   el.find('.anm_det_pop').text().match(/(?=[^\s]*$)\d+/)[0]
 
   episode: ($, body) ->
     videoFrames = $('.tab-pane iframe').get().map (item) ->
