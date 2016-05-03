@@ -1,12 +1,12 @@
 # aniscrape-animebam
 
-aniscrape-animebam is a provider for the [aniscrape](https://github.com/roflmuffin/aniscrape) node module. 
+aniscrape-animebam is a provider for the [aniscrape](https://github.com/roflmuffin/aniscrape) node module.
 
 By including it you get to do awesome things with anime sites, such as retrieve anime pages, episode listings and ultimately video links. See [here](https://github.com/roflmuffin/aniscrape/blob/master/readme.md) for more details.
 
 ```js
 var Aniscrape = require('aniscrape'); // Check source on GitHub for more info.
-var animebam = require('aniscrape-animebam'); 
+var animebam = require('aniscrape-animebam');
 
 var scraper = new Aniscrape();
 scraper.use(animebam)
@@ -23,3 +23,6 @@ scraper.use(animebam)
   })
 })
 ```
+
+## Kudos to contributors
+- Santiago Secades
